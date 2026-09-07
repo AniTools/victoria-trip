@@ -17,122 +17,130 @@
     --muted: #8C9490;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   html, body {
     background: var(--cream);
     font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
     color: var(--text);
-    font-size: 17px;
-    line-height: 1.45;
+    font-size: 19px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    overflow-wrap: break-word;
   }
+  body { max-width: 620px; margin: 0 auto; }
 
-  header { background: var(--forest); color: var(--ink); padding: 30px 20px 22px 20px; }
+  header { background: var(--forest); color: var(--ink); padding: 32px 22px 24px 22px; }
   header .kicker {
     font-family: Georgia, serif; font-style: italic;
-    font-size: 14px; color: var(--gold); margin-bottom: 8px;
+    font-size: 16px; color: var(--gold); margin-bottom: 8px;
   }
   header h1 {
     font-family: Georgia, serif; font-weight: normal;
-    font-size: 29px; line-height: 1.2; margin-bottom: 6px;
+    font-size: 32px; line-height: 1.2; margin-bottom: 8px;
   }
-  header .dates { font-size: 15px; color: #CFE0DA; }
+  header .dates { font-size: 17px; color: #CFE0DA; }
   header .hotel {
     margin-top: 16px; padding-top: 14px;
     border-top: 1px solid var(--forest-deep);
-    font-size: 13.5px; color: #B9CFC8;
+    font-size: 15px; color: #B9CFC8;
   }
   header .hotel strong { color: var(--ink); }
 
-  .lang-toggle { display: flex; gap: 8px; margin-top: 16px; }
+  .lang-toggle { display: flex; gap: 8px; margin-top: 18px; }
   .lang-toggle button {
-    flex: 1; padding: 10px 0; border-radius: 8px;
+    flex: 1; padding: 13px 0; border-radius: 8px;
     border: 1px solid var(--forest-deep); background: transparent;
-    color: #B9CFC8; font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
+    color: #B9CFC8; font-size: 16px; font-weight: 600; letter-spacing: 0.5px;
   }
   .lang-toggle button.active { background: var(--gold); color: var(--forest-deep); border-color: var(--gold); }
 
   .day-tabs { display: flex; background: var(--forest-deep); position: sticky; top: 0; z-index: 10; }
   .day-tabs button {
-    flex: 1; padding: 14px 4px; background: transparent; border: none;
-    color: #8FAAA2; font-size: 13.5px; font-weight: 600;
+    flex: 1; padding: 16px 4px; background: transparent; border: none;
+    color: #8FAAA2; font-size: 15.5px; font-weight: 600;
     font-family: -apple-system, Arial, sans-serif;
     border-bottom: 3px solid transparent;
   }
   .day-tabs button.active { color: var(--ink); border-bottom: 3px solid var(--coral); }
 
-  main { padding: 18px 16px 40px 16px; }
+  main { padding: 20px 16px 44px 16px; }
   .panel { display: none; }
   .panel.active { display: block; }
 
   /* ---- itinerary item: text left, BIG photo right ---- */
   .item {
-    display: flex; gap: 14px; padding: 16px 0;
+    display: flex; gap: 14px; padding: 18px 0;
     border-bottom: 1px solid var(--line); align-items: flex-start;
   }
   .item .body { flex: 1; min-width: 0; }
-  .item .time-row { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
-  .item .time { font-family: Georgia, serif; font-weight: bold; color: var(--forest); font-size: 14.5px; }
-  .item .icon { font-size: 16px; }
-  .item .title { font-size: 16.5px; color: var(--text); }
+  .item .time-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .item .time { font-family: Georgia, serif; font-weight: bold; color: var(--forest); font-size: 16.5px; }
+  .item .icon { font-size: 19px; }
+  .item .title { font-size: 18px; color: var(--text); }
   .item .title strong { color: var(--forest); }
   .item .tag {
-    display: inline-block; margin-top: 5px; font-size: 11px;
+    display: inline-block; margin-top: 6px; font-size: 12.5px;
     letter-spacing: 0.5px; color: var(--coral); font-weight: 700;
   }
   .item a.maplink {
-    display: block; margin-top: 7px; font-size: 12.5px;
+    display: block; margin-top: 8px; font-size: 14.5px;
     color: var(--muted); text-decoration: none;
-    border-bottom: 1px solid var(--line); padding-bottom: 2px;
+    border-bottom: 1px solid var(--line); padding-bottom: 3px;
   }
   .item .photo-wrap {
-    width: 116px; height: 116px; flex-shrink: 0;
+    width: 118px; height: 118px; flex-shrink: 0;
     border-radius: 14px; overflow: hidden; background: var(--line);
     display: block; text-decoration: none;
   }
   .item .photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .item .photo-wrap.placeholder {
     display: flex; align-items: center; justify-content: center;
-    font-size: 34px; background: #EFE8D8;
+    font-size: 36px; background: #EFE8D8;
   }
 
   /* ---- map tab ---- */
   .map-frame {
-    width: 100%; height: 340px; border: none;
+    width: 100%; height: 320px; border: none;
     border-radius: 14px; margin-bottom: 8px; background: var(--line);
   }
-  .map-note { font-size: 13px; color: var(--muted); margin: 10px 2px 18px 2px; line-height: 1.5; }
+  .map-note { font-size: 15px; color: var(--muted); margin: 12px 2px 20px 2px; line-height: 1.55; }
   .map-day-title {
-    font-family: Georgia, serif; font-size: 17px; color: var(--forest);
-    margin: 20px 0 10px 0; padding-bottom: 7px; border-bottom: 2px solid var(--coral);
+    font-family: Georgia, serif; font-size: 20px; color: var(--forest);
+    margin: 24px 0 12px 0; padding-bottom: 8px; border-bottom: 2px solid var(--coral);
   }
   a.place-btn {
-    display: flex; align-items: center; gap: 11px;
-    padding: 13px 14px; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 15px 15px; margin-bottom: 9px;
     background: #fff; border: 1px solid var(--line); border-radius: 11px;
-    text-decoration: none; color: var(--text); font-size: 15.5px;
+    text-decoration: none; color: var(--text); font-size: 17px;
   }
-  a.place-btn .pin { font-size: 19px; flex-shrink: 0; }
-  a.place-btn .arrow { margin-left: auto; color: var(--muted); font-size: 14px; }
+  a.place-btn > span:not(.pin):not(.arrow):not(.step-num) { flex: 1; min-width: 0; }
+  a.place-btn .pin { font-size: 21px; flex-shrink: 0; }
+  a.place-btn .arrow { margin-left: auto; color: var(--muted); font-size: 16px; flex-shrink: 0; }
   a.place-btn .step-num {
-    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    flex-shrink: 0; width: 25px; height: 25px; border-radius: 50%;
     background: var(--forest); color: var(--ink);
-    font-size: 12.5px; font-weight: 700;
+    font-size: 14px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
   }
   a.route-btn {
     display: block; text-align: center; text-decoration: none;
     background: var(--forest); color: var(--ink);
-    font-size: 13.5px; font-weight: 700; letter-spacing: 0.3px;
-    padding: 12px 14px; border-radius: 11px; margin: 2px 0 12px 0;
+    font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
+    padding: 14px 14px; border-radius: 11px; margin: 2px 0 14px 0;
   }
 
   .notes {
-    margin-top: 24px; background: #F0E9D8;
-    border-left: 3px solid var(--gold); padding: 16px 18px; border-radius: 4px;
+    margin-top: 26px; background: #F0E9D8;
+    border-left: 3px solid var(--gold); padding: 18px 20px; border-radius: 4px;
   }
-  .notes .notes-title { font-family: Georgia, serif; font-size: 14.5px; color: var(--forest); margin-bottom: 8px; }
-  .notes li { font-size: 13.5px; color: #4A5652; margin-bottom: 5px; margin-left: 16px; line-height: 1.5; }
+  .notes .notes-title { font-family: Georgia, serif; font-size: 16.5px; color: var(--forest); margin-bottom: 10px; }
+  .notes li { font-size: 15px; color: #4A5652; margin-bottom: 7px; margin-left: 18px; line-height: 1.55; }
 
-  footer { text-align: center; font-size: 11px; color: var(--muted); padding: 24px 0 8px 0; letter-spacing: 0.5px; }
+  footer { text-align: center; font-size: 12.5px; color: var(--muted); padding: 26px 0 10px 0; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
