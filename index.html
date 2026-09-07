@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Victoria Trip</title>
+<style>
+  :root {
+    --ink: #F5F1E8;
+    --forest: #1B4B43;
+    --forest-deep: #123531;
+    --coral: #E07856;
+    --gold: #C9A876;
+    --cream: #FAF6EF;
+    --line: #E5DCC8;
+    --text: #2B3A36;
+    --muted: #8C9490;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    background: var(--cream);
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text);
+    font-size: 17px;
+    line-height: 1.45;
+  }
+
+  header { background: var(--forest); color: var(--ink); padding: 30px 20px 22px 20px; }
+  header .kicker {
+    font-family: Georgia, serif; font-style: italic;
+    font-size: 14px; color: var(--gold); margin-bottom: 8px;
+  }
+  header h1 {
+    font-family: Georgia, serif; font-weight: normal;
+    font-size: 29px; line-height: 1.2; margin-bottom: 6px;
+  }
+  header .dates { font-size: 15px; color: #CFE0DA; }
+  header .hotel {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid var(--forest-deep);
+    font-size: 13.5px; color: #B9CFC8;
+  }
+  header .hotel strong { color: var(--ink); }
+
+  .lang-toggle { display: flex; gap: 8px; margin-top: 16px; }
+  .lang-toggle button {
+    flex: 1; padding: 10px 0; border-radius: 8px;
+    border: 1px solid var(--forest-deep); background: transparent;
+    color: #B9CFC8; font-size: 14px; font-weight: 600; letter-spacing: 0.5px;
+  }
+  .lang-toggle button.active { background: var(--gold); color: var(--forest-deep); border-color: var(--gold); }
+
+  .day-tabs { display: flex; background: var(--forest-deep); position: sticky; top: 0; z-index: 10; }
+  .day-tabs button {
+    flex: 1; padding: 14px 4px; background: transparent; border: none;
+    color: #8FAAA2; font-size: 13.5px; font-weight: 600;
+    font-family: -apple-system, Arial, sans-serif;
+    border-bottom: 3px solid transparent;
+  }
+  .day-tabs button.active { color: var(--ink); border-bottom: 3px solid var(--coral); }
+
+  main { padding: 18px 16px 40px 16px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ---- itinerary item: text left, BIG photo right ---- */
+  .item {
+    display: flex; gap: 14px; padding: 16px 0;
+    border-bottom: 1px solid var(--line); align-items: flex-start;
+  }
+  .item .body { flex: 1; min-width: 0; }
+  .item .time-row { display: flex; align-items: center; gap: 7px; margin-bottom: 3px; }
+  .item .time { font-family: Georgia, serif; font-weight: bold; color: var(--forest); font-size: 14.5px; }
+  .item .icon { font-size: 16px; }
+  .item .title { font-size: 16.5px; color: var(--text); }
+  .item .title strong { color: var(--forest); }
+  .item .tag {
+    display: inline-block; margin-top: 5px; font-size: 11px;
+    letter-spacing: 0.5px; color: var(--coral); font-weight: 700;
+  }
+  .item a.maplink {
+    display: block; margin-top: 7px; font-size: 12.5px;
+    color: var(--muted); text-decoration: none;
+    border-bottom: 1px solid var(--line); padding-bottom: 2px;
+  }
+  .item .photo-wrap {
+    width: 116px; height: 116px; flex-shrink: 0;
+    border-radius: 14px; overflow: hidden; background: var(--line);
+    display: block; text-decoration: none;
+  }
+  .item .photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .item .photo-wrap.placeholder {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px; background: #EFE8D8;
+  }
+
+  /* ---- map tab ---- */
+  .map-frame {
+    width: 100%; height: 340px; border: none;
+    border-radius: 14px; margin-bottom: 8px; background: var(--line);
+  }
+  .map-note { font-size: 13px; color: var(--muted); margin: 10px 2px 18px 2px; line-height: 1.5; }
+  .map-day-title {
+    font-family: Georgia, serif; font-size: 17px; color: var(--forest);
+    margin: 20px 0 10px 0; padding-bottom: 7px; border-bottom: 2px solid var(--coral);
+  }
+  a.place-btn {
+    display: flex; align-items: center; gap: 11px;
+    padding: 13px 14px; margin-bottom: 8px;
+    background: #fff; border: 1px solid var(--line); border-radius: 11px;
+    text-decoration: none; color: var(--text); font-size: 15.5px;
+  }
+  a.place-btn .pin { font-size: 19px; flex-shrink: 0; }
+  a.place-btn .arrow { margin-left: auto; color: var(--muted); font-size: 14px; }
+  a.place-btn .step-num {
+    flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--forest); color: var(--ink);
+    font-size: 12.5px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  a.route-btn {
+    display: block; text-align: center; text-decoration: none;
+    background: var(--forest); color: var(--ink);
+    font-size: 13.5px; font-weight: 700; letter-spacing: 0.3px;
+    padding: 12px 14px; border-radius: 11px; margin: 2px 0 12px 0;
+  }
+
+  .notes {
+    margin-top: 24px; background: #F0E9D8;
+    border-left: 3px solid var(--gold); padding: 16px 18px; border-radius: 4px;
+  }
+  .notes .notes-title { font-family: Georgia, serif; font-size: 14.5px; color: var(--forest); margin-bottom: 8px; }
+  .notes li { font-size: 13.5px; color: #4A5652; margin-bottom: 5px; margin-left: 16px; line-height: 1.5; }
+
+  footer { text-align: center; font-size: 11px; color: var(--muted); padding: 24px 0 8px 0; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker" id="kicker"></div>
+  <h1 id="title"></h1>
+  <div class="dates" id="dates"></div>
+  <div class="hotel">
+    <strong>HOTEL:</strong> Huntingdon Hotel &amp; Suites, 330 Quebec St<br>
+    <span id="checkLabel"></span>
+  </div>
+  <div class="lang-toggle">
+    <button id="btnEs" class="active" onclick="setLang('es')">Español</button>
+    <button id="btnEn" onclick="setLang('en')">English</button>
+  </div>
+</header>
+
+<div class="day-tabs">
+  <button id="tab1" class="active" onclick="setTab(1)"></button>
+  <button id="tab2" onclick="setTab(2)"></button>
+  <button id="tab3" onclick="setTab(3)"></button>
+</div>
+
+<main>
+  <div id="panel1" class="panel active"></div>
+  <div id="panel2" class="panel"></div>
+  <div id="panel3" class="panel"></div>
+  <div class="notes" id="notesBox">
+    <div class="notes-title" id="notesTitle"></div>
+    <ul id="notesList"></ul>
+  </div>
+</main>
+
+<footer>VICTORIA, BC · SEPTEMBER 2026</footer>
+
+<script>
+const IMG = {
+  butchart:  "https://commons.wikimedia.org/wiki/Special:FilePath/Butchart_Garden_splendor.jpg?width=500",
+  castle:    "https://commons.wikimedia.org/wiki/Special:FilePath/Craigdarroch_castle.jpg?width=500",
+  empress:   "https://commons.wikimedia.org/wiki/Special:FilePath/2012-07-13_Fairmont_Empress.jpg?width=500",
+  parliament:"https://commons.wikimedia.org/wiki/Special:FilePath/British_Columbia_Parliament_Building.JPG?width=500",
+  beacon:    "https://commons.wikimedia.org/wiki/Special:FilePath/Peacock_at_Beacon_Hill_Park,_Victoria_BC.jpg?width=500",
+  fantan:    "https://commons.wikimedia.org/wiki/Special:FilePath/Fan_Tan_Alley,_Victoria,_British_Columbia,_Canada_08.jpg?width=500",
+  totem:     "https://commons.wikimedia.org/wiki/Special:FilePath/Totem_poles_Victoria_BC_Thunderbird_Park.jpeg?width=500",
+  wharf:     "https://commons.wikimedia.org/wiki/Special:FilePath/Fisherman's_Wharf_Park,_Victoria,_British_Columbia_08.jpg?width=500",
+  harbour:   "https://commons.wikimedia.org/wiki/Special:FilePath/British_Columbia_Parliament_Buildings_-_Pano_-_HDR.jpg?width=600",
+  tolmie:    "https://commons.wikimedia.org/wiki/Special:FilePath/British_Columbia_legislature_building_roof_close_up.jpg?width=500",
+  ferry:     "https://commons.wikimedia.org/wiki/Special:FilePath/Harbour_Fisherman's_Wharf_Victoria_Vancouver_island_(30853059558).jpg?width=500",
+  hatley:    "https://commons.wikimedia.org/wiki/Special:FilePath/Hatley_Castle_2022,_BC.jpg?width=500"
+};
+
+const P = {
+  swartz:    "ChIJx9fUEopnj1QRkUK8kKVUPxQ",
+  saanichton:"ChIJHZ7cL9Ruj1QRWDsDVgHaQL4",
+  butchart:  "ChIJ_1moAhpsj1QRQfH19r1-eM8",
+  hotel:     "ChIJyUiW1Jl0j1QRUVX2cjNHVfk",
+  harbour:   "ChIJB3z9ewB1j1QR7lIMSqOhff4",
+  empress:   "ChIJifpQ75B0j1QRTJ17niGHLuI",
+  parliament:"ChIJgcJti4R0j1QRHW6-NyyjuKg",
+  totem:     "ChIJ5ZScPpF0j1QRBLCY8tTvWsM",
+  fantan:    "ChIJI154n4R0j1QR5M4vgmMPoRs",
+  dinner:    "ChIJXR8xI5t0j1QRjRUeLvaOsfY",
+  castle:    "ChIJ13vUgIp0j1QRbx3mZXLZILI",
+  beacon:    "ChIJa4uQ3-p0j1QRDtSaFQ5NHrQ",
+  breakwater:"ChIJtUEiSrB0j1QR4D5z7p3pyrw",
+  wharf:     "ChIJmXc0Z6J0j1QR4CJUS73dyZk",
+  tolmie:    "ChIJGdxzX_pzj1QRjbNBc7pVhgQ"
+};
+
+const DATA = {
+  es: {
+    kicker: "Itinerario de viaje",
+    title: "Un día y una noche<br>en Victoria, BC",
+    dates: "7 – 8 de septiembre, 2026",
+    checkLabel: "Check-in Lunes ~1:30pm · Check-out Martes temprano (mochilas en recepción)",
+    tab1: "Día 1 · Lun", tab2: "Día 2 · Mar", tab3: "🗺 Mapa",
+    mapLink: "Ver en mapa →",
+    routeBtn: "Abrir la ruta completa del día en Google Maps →",
+    mapNote: "Cada día en orden: el mapa muestra la ruta y abajo están las paradas numeradas. Toca cualquier parada para abrirla con indicaciones desde donde estés.",
+    mapDay1: "Día 1 — Lunes 7", mapDay2: "Día 2 — Martes 8",
+    notesTitle: "Notas importantes",
+    notes: [
+      "<strong>Día 2 es intenso:</strong> dos castillos + todo lo demás antes del ferry. Si van tarde, salten Mount Tolmie.",
+      "<strong>Hatley Castle (Colwood):</strong> jardines abren 10:00am; ~20 min en Uber desde downtown. Interior solo con tour guiado (horario limitado); los jardines Italiano/Japonés/Rosas son lo principal.",
+      "<strong>Craigdarroch Castle:</strong> ~87 escalones adentro, sin ascensor.",
+      "<strong>Mount Tolmie:</strong> transporte obligatorio, es subida larga.",
+      "<strong>Il Terrazzo:</strong> reservar sí o sí (250-361-0028), abre lunes desde las 4pm.",
+      "Todo marcado <strong>A PIE</strong> es plano y cómodo.",
+      "Todo marcado <strong>UBER/CARRO</strong> es por cuesta o distancia larga."
+    ],
+    day1: [
+      ["8:00am","⛴","Ferry sale de Tsawwassen","FERRY", null, IMG.ferry],
+      ["9:35am","📍","Llegan a Swartz Bay","", P.swartz, null],
+      ["9:45am","🚌","Bus a Saanichton Exchange","BUS #72", P.saanichton, null],
+      ["10:00am","🚌","Transbordo hacia Butchart","BUS #75", P.butchart, null],
+      ["10:50am","🌷","<strong>Butchart Gardens</strong> — 2h sin apuro","", P.butchart, IMG.butchart],
+      ["12:30pm","🚌","Bus directo a Downtown","BUS #75", null, null],
+      ["1:30pm","🏨","Check-in hotel","A PIE", P.hotel, null],
+      ["2:00pm","🍤","<strong>Almuerzo:</strong> Red Fish Blue Fish (mariscos casual, en el muelle)","A PIE", "q:Red Fish Blue Fish, Victoria BC", null],
+      ["2:45pm","🚶","Inner Harbour","A PIE", P.harbour, IMG.harbour],
+      ["3:05pm","🚶","Fairmont Empress Hotel","A PIE", P.empress, IMG.empress],
+      ["3:25pm","🚶","Parlamento de BC","A PIE", P.parliament, IMG.parliament],
+      ["3:50pm","🗿","Thunderbird Park — tótems","A PIE", P.totem, IMG.totem],
+      ["4:15pm","🏮","Fan Tan Alley / Chinatown","A PIE", P.fantan, IMG.fantan],
+      ["5:00pm","🏨","Vuelta al hotel a descansar","A PIE", P.hotel, null],
+      ["7:30pm","🍽","<strong>Cena:</strong> Il Terrazzo (italiano, patio romántico) — 555 Johnson St","A PIE", "q:Il Terrazzo Ristorante, 555 Johnson St, Victoria BC", null]
+    ],
+    day2: [
+      ["8:30am","🍳","Desayuno en el hotel","", P.hotel, null],
+      ["9:15am","🎒","Empacar mochilas","", null, null],
+      ["9:45am","🏨","Check-out, mochilas en recepción","", null, null],
+      ["10:00am","🚗","Uber a Hatley Castle (Colwood)","UBER ~20min", "q:Hatley Castle, Colwood BC", null],
+      ["10:20am","🏰","<strong>Hatley Park Gardens</strong> — jardines Italiano/Japonés/Rosas + exterior del castillo","UBER", "q:Hatley Castle, Colwood BC", IMG.hatley],
+      ["11:30am","🚗","Uber a Craigdarroch Castle","UBER ~25min", P.castle, null],
+      ["12:00pm","🏰","<strong>Craigdarroch Castle</strong> — 1h sin correr","UBER", P.castle, IMG.castle],
+      ["1:15pm","🌳","Beacon Hill Park — paseo corto","A PIE", P.beacon, IMG.beacon],
+      ["1:50pm","🚶","Dallas Rd → Breakwater Lighthouse","A PIE", P.breakwater, null],
+      ["2:45pm","🐟","<strong>Almuerzo:</strong> Barb's Fish & Chips, Fisherman's Wharf","A PIE", "q:Barb's Fish and Chips, Fisherman's Wharf, Victoria BC", IMG.wharf],
+      ["4:00pm","⛰","<strong>Mount Tolmie</strong> — mirador (opcional si van tarde)","BUS #4/14", P.tolmie, IMG.tolmie],
+      ["5:45pm","🎒","Bajan, recogen mochilas","BUS", P.hotel, null],
+      ["6:30pm","🚗","Amiga los recoge → Swartz Bay","CARRO", null, null],
+      ["7:15pm","📍","Llegan a Swartz Bay","", P.swartz, null],
+      ["8:00pm","⛴","Ferry de regreso a Tsawwassen","FERRY", P.swartz, null]
+    ],
+    route1: [
+      ["🌷","Butchart Gardens", "q:Butchart Gardens, Brentwood Bay BC"],
+      ["🏨","Huntingdon Hotel (check-in)", "q:Huntingdon Hotel & Suites, Victoria BC"],
+      ["🍤","Red Fish Blue Fish (almuerzo)", "q:Red Fish Blue Fish, Victoria BC"],
+      ["⚓","Inner Harbour", "q:Inner Harbour, Victoria BC"],
+      ["🏛","Fairmont Empress", "q:Fairmont Empress, Victoria BC"],
+      ["🏛","Parlamento de BC", "q:BC Parliament Buildings, Victoria BC"],
+      ["🗿","Thunderbird Park", "q:Thunderbird Park, Victoria BC"],
+      ["🏮","Fan Tan Alley", "q:Fan Tan Alley, Victoria BC"],
+      ["🍽","Il Terrazzo (cena)", "q:Il Terrazzo Ristorante, 555 Johnson St, Victoria BC"]
+    ],
+    route2: [
+      ["🏨","Huntingdon Hotel (check-out)", "q:Huntingdon Hotel & Suites, Victoria BC"],
+      ["🏰","Hatley Castle (Colwood)", "q:Hatley Castle, Colwood BC"],
+      ["🏰","Craigdarroch Castle", "q:Craigdarroch Castle, Victoria BC"],
+      ["🌳","Beacon Hill Park", "q:Beacon Hill Park, Victoria BC"],
+      ["🗼","Breakwater Lighthouse", "q:Ogden Point Breakwater, Victoria BC"],
+      ["🐟","Fisherman's Wharf (almuerzo)", "q:Fisherman's Wharf, Victoria BC"],
+      ["⛰","Mount Tolmie", "q:Mount Tolmie, Saanich BC"],
+      ["⛴","Swartz Bay Terminal", "q:Swartz Bay Ferry Terminal, BC"]
+    ],
+    places1: [
+      ["🌷","Butchart Gardens", P.butchart],
+      ["🏨","Huntingdon Hotel", P.hotel],
+      ["🍤","Red Fish Blue Fish (almuerzo)", "q:Red Fish Blue Fish, Victoria BC"],
+      ["⚓","Inner Harbour", P.harbour],
+      ["🏛","Fairmont Empress", P.empress],
+      ["🏛","Parlamento de BC", P.parliament],
+      ["🗿","Thunderbird Park", P.totem],
+      ["🏮","Fan Tan Alley", P.fantan],
+      ["🍽","Il Terrazzo (cena)", "q:Il Terrazzo Ristorante, 555 Johnson St, Victoria BC"]
+    ],
+    places2: [
+      ["🏰","Hatley Castle (Colwood)", "q:Hatley Castle, Colwood BC"],
+      ["🏰","Craigdarroch Castle", P.castle],
+      ["🌳","Beacon Hill Park", P.beacon],
+      ["🗼","Breakwater Lighthouse", P.breakwater],
+      ["🐟","Barb's Fish & Chips (almuerzo)", "q:Barb's Fish and Chips, Fisherman's Wharf, Victoria BC"],
+      ["⛰","Mount Tolmie", P.tolmie],
+      ["⛴","Swartz Bay Terminal", P.swartz]
+    ]
+  },
+  en: {
+    kicker: "Travel itinerary",
+    title: "One day and one night<br>in Victoria, BC",
+    dates: "September 7 – 8, 2026",
+    checkLabel: "Check-in Monday ~1:30pm · Check-out Tuesday early (bags at front desk)",
+    tab1: "Day 1 · Mon", tab2: "Day 2 · Tue", tab3: "🗺 Map",
+    mapLink: "Open in maps →",
+    routeBtn: "Open the day's full route in Google Maps →",
+    mapNote: "Each day in order: the map shows the route and the numbered stops are listed below it. Tap any stop to open it with directions from where you are.",
+    mapDay1: "Day 1 — Monday 7", mapDay2: "Day 2 — Tuesday 8",
+    notesTitle: "Important notes",
+    notes: [
+      "<strong>Day 2 is packed:</strong> two castles plus everything else before the ferry. If you fall behind, skip Mount Tolmie.",
+      "<strong>Hatley Castle (Colwood):</strong> gardens open 10:00am; ~20 min by Uber from downtown. Castle interior by guided tour only (limited times); the Italian / Japanese / Rose gardens are the main draw.",
+      "<strong>Craigdarroch Castle:</strong> ~87 steps inside, no elevator.",
+      "<strong>Mount Tolmie:</strong> transport required, long uphill.",
+      "<strong>Il Terrazzo:</strong> reservations are a must (250-361-0028), open Monday from 4pm.",
+      "Everything marked <strong>WALK</strong> is flat and comfortable.",
+      "Everything marked <strong>UBER/CAR</strong> is a hill or long distance."
+    ],
+    day1: [
+      ["8:00am","⛴","Ferry departs Tsawwassen","FERRY", null, IMG.ferry],
+      ["9:35am","📍","Arrive Swartz Bay","", P.swartz, null],
+      ["9:45am","🚌","Bus to Saanichton Exchange","BUS #72", P.saanichton, null],
+      ["10:00am","🚌","Transfer toward Butchart","BUS #75", P.butchart, null],
+      ["10:50am","🌷","<strong>Butchart Gardens</strong> — 2 unhurried hours","", P.butchart, IMG.butchart],
+      ["12:30pm","🚌","Direct bus to Downtown","BUS #75", null, null],
+      ["1:30pm","🏨","Hotel check-in","WALK", P.hotel, null],
+      ["2:00pm","🍤","<strong>Lunch:</strong> Red Fish Blue Fish (casual seafood on the dock)","WALK", "q:Red Fish Blue Fish, Victoria BC", null],
+      ["2:45pm","🚶","Inner Harbour","WALK", P.harbour, IMG.harbour],
+      ["3:05pm","🚶","Fairmont Empress Hotel","WALK", P.empress, IMG.empress],
+      ["3:25pm","🚶","BC Parliament Buildings","WALK", P.parliament, IMG.parliament],
+      ["3:50pm","🗿","Thunderbird Park — totem poles","WALK", P.totem, IMG.totem],
+      ["4:15pm","🏮","Fan Tan Alley / Chinatown","WALK", P.fantan, IMG.fantan],
+      ["5:00pm","🏨","Back to hotel to rest","WALK", P.hotel, null],
+      ["7:30pm","🍽","<strong>Dinner:</strong> Il Terrazzo (Italian, romantic courtyard) — 555 Johnson St","WALK", "q:Il Terrazzo Ristorante, 555 Johnson St, Victoria BC", null]
+    ],
+    day2: [
+      ["8:30am","🍳","Breakfast at the hotel","", P.hotel, null],
+      ["9:15am","🎒","Pack bags","", null, null],
+      ["9:45am","🏨","Check-out, bags at front desk","", null, null],
+      ["10:00am","🚗","Uber to Hatley Castle (Colwood)","UBER ~20min", "q:Hatley Castle, Colwood BC", null],
+      ["10:20am","🏰","<strong>Hatley Park Gardens</strong> — Italian / Japanese / Rose gardens + castle exterior","UBER", "q:Hatley Castle, Colwood BC", IMG.hatley],
+      ["11:30am","🚗","Uber to Craigdarroch Castle","UBER ~25min", P.castle, null],
+      ["12:00pm","🏰","<strong>Craigdarroch Castle</strong> — 1h, no rush","UBER", P.castle, IMG.castle],
+      ["1:15pm","🌳","Beacon Hill Park — short stroll","WALK", P.beacon, IMG.beacon],
+      ["1:50pm","🚶","Dallas Rd → Breakwater Lighthouse","WALK", P.breakwater, null],
+      ["2:45pm","🐟","<strong>Lunch:</strong> Barb's Fish & Chips, Fisherman's Wharf","WALK", "q:Barb's Fish and Chips, Fisherman's Wharf, Victoria BC", IMG.wharf],
+      ["4:00pm","⛰","<strong>Mount Tolmie</strong> — lookout (skip if running late)","BUS #4/14", P.tolmie, IMG.tolmie],
+      ["5:45pm","🎒","Head down, pick up bags","BUS", P.hotel, null],
+      ["6:30pm","🚗","Friend picks up → Swartz Bay","CAR", null, null],
+      ["7:15pm","📍","Arrive Swartz Bay","", P.swartz, null],
+      ["8:00pm","⛴","Ferry back to Tsawwassen","FERRY", P.swartz, null]
+    ],
+    route1: [
+      ["🌷","Butchart Gardens", "q:Butchart Gardens, Brentwood Bay BC"],
+      ["🏨","Huntingdon Hotel (check-in)", "q:Huntingdon Hotel & Suites, Victoria BC"],
+      ["🍤","Red Fish Blue Fish (lunch)", "q:Red Fish Blue Fish, Victoria BC"],
+      ["⚓","Inner Harbour", "q:Inner Harbour, Victoria BC"],
+      ["🏛","Fairmont Empress", "q:Fairmont Empress, Victoria BC"],
+      ["🏛","BC Parliament Buildings", "q:BC Parliament Buildings, Victoria BC"],
+      ["🗿","Thunderbird Park", "q:Thunderbird Park, Victoria BC"],
+      ["🏮","Fan Tan Alley", "q:Fan Tan Alley, Victoria BC"],
+      ["🍽","Il Terrazzo (dinner)", "q:Il Terrazzo Ristorante, 555 Johnson St, Victoria BC"]
+    ],
+    route2: [
+      ["🏨","Huntingdon Hotel (check-out)", "q:Huntingdon Hotel & Suites, Victoria BC"],
+      ["🏰","Hatley Castle (Colwood)", "q:Hatley Castle, Colwood BC"],
+      ["🏰","Craigdarroch Castle", "q:Craigdarroch Castle, Victoria BC"],
+      ["🌳","Beacon Hill Park", "q:Beacon Hill Park, Victoria BC"],
+      ["🗼","Breakwater Lighthouse", "q:Ogden Point Breakwater, Victoria BC"],
+      ["🐟","Fisherman's Wharf (lunch)", "q:Fisherman's Wharf, Victoria BC"],
+      ["⛰","Mount Tolmie", "q:Mount Tolmie, Saanich BC"],
+      ["⛴","Swartz Bay Terminal", "q:Swartz Bay Ferry Terminal, BC"]
+    ],
+    places1: [
+      ["🌷","Butchart Gardens", P.butchart],
+      ["🏨","Huntingdon Hotel", P.hotel],
+      ["🍤","Red Fish Blue Fish (lunch)", "q:Red Fish Blue Fish, Victoria BC"],
+      ["⚓","Inner Harbour", P.harbour],
+      ["🏛","Fairmont Empress", P.empress],
+      ["🏛","BC Parliament Buildings", P.parliament],
+      ["🗿","Thunderbird Park", P.totem],
+      ["🏮","Fan Tan Alley", P.fantan],
+      ["🍽","Il Terrazzo (dinner)", "q:Il Terrazzo Ristorante, 555 Johnson St, Victoria BC"]
+    ],
+    places2: [
+      ["🏰","Hatley Castle (Colwood)", "q:Hatley Castle, Colwood BC"],
+      ["🏰","Craigdarroch Castle", P.castle],
+      ["🌳","Beacon Hill Park", P.beacon],
+      ["🗼","Breakwater Lighthouse", P.breakwater],
+      ["🐟","Barb's Fish & Chips (lunch)", "q:Barb's Fish and Chips, Fisherman's Wharf, Victoria BC"],
+      ["⛰","Mount Tolmie", P.tolmie],
+      ["⛴","Swartz Bay Terminal", P.swartz]
+    ]
+  }
+};
+
+const mapUrl = v => (v && v.slice(0, 2) === "q:")
+  ? "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(v.slice(2))
+  : "https://www.google.com/maps/place/?q=place_id:" + v;
+
+// ordered stops [pin, name, query] -> a Google Maps directions URL that draws the route
+const dirUrl = stops => "https://www.google.com/maps/dir/" +
+  stops.map(s => encodeURIComponent((s[2].slice(0, 2) === "q:" ? s[2].slice(2) : s[1]))).join("/");
+
+// ordered stops -> embeddable map that shows the route line (no API key needed)
+const routeEmbed = stops => {
+  const clean = s => encodeURIComponent(s[2].slice(0, 2) === "q:" ? s[2].slice(2) : s[1]);
+  const saddr = clean(stops[0]);
+  const daddr = stops.slice(1).map(clean).join("+to:");
+  return "https://maps.google.com/maps?saddr=" + saddr + "&daddr=" + daddr + "&output=embed";
+};
+
+function renderDay(items, linkLabel) {
+  return items.map(([time, icon, title, tag, placeId, photo]) => `
+    <div class="item">
+      <div class="body">
+        <div class="time-row"><span class="time">${time}</span><span class="icon">${icon}</span></div>
+        <div class="title">${title}</div>
+        ${tag ? `<div class="tag">${tag}</div>` : ""}
+        ${placeId ? `<a class="maplink" href="${mapUrl(placeId)}" target="_blank" rel="noopener">${linkLabel}</a>` : ""}
+      </div>
+      ${photo
+        ? `<a class="photo-wrap" href="${placeId ? mapUrl(placeId) : '#'}" target="_blank" rel="noopener"><img src="${photo}" loading="lazy" alt=""></a>`
+        : `<div class="photo-wrap placeholder">${icon}</div>`}
+    </div>
+  `).join("");
+}
+
+function renderMap(d) {
+  const stops = list => list.map(([pin, name, id], i) => `
+    <a class="place-btn" href="${mapUrl(id)}" target="_blank" rel="noopener">
+      <span class="step-num">${i + 1}</span>
+      <span class="pin">${pin}</span><span>${name}</span><span class="arrow">›</span>
+    </a>`).join("");
+  const dayBlock = (titleTxt, route) => `
+    <div class="map-day-title">${titleTxt}</div>
+    <iframe class="map-frame" loading="lazy" allowfullscreen
+      src="${routeEmbed(route)}"></iframe>
+    <a class="route-btn" href="${dirUrl(route)}" target="_blank" rel="noopener">${d.routeBtn}</a>
+    ${stops(route)}
+  `;
+  return `
+    <div class="map-note">${d.mapNote}</div>
+    ${dayBlock(d.mapDay1, d.route1)}
+    ${dayBlock(d.mapDay2, d.route2)}
+  `;
+}
+
+let currentLang = 'es', currentTab = 1;
+
+function setLang(lang) {
+  currentLang = lang;
+  const d = DATA[lang];
+  document.getElementById('kicker').textContent = d.kicker;
+  document.getElementById('title').innerHTML = d.title;
+  document.getElementById('dates').textContent = d.dates;
+  document.getElementById('checkLabel').textContent = d.checkLabel;
+  document.getElementById('tab1').textContent = d.tab1;
+  document.getElementById('tab2').textContent = d.tab2;
+  document.getElementById('tab3').textContent = d.tab3;
+  document.getElementById('notesTitle').textContent = d.notesTitle;
+  document.getElementById('notesList').innerHTML = d.notes.map(n => `<li>${n}</li>`).join("");
+  document.getElementById('panel1').innerHTML = renderDay(d.day1, d.mapLink);
+  document.getElementById('panel2').innerHTML = renderDay(d.day2, d.mapLink);
+  document.getElementById('panel3').innerHTML = renderMap(d);
+  document.getElementById('btnEs').classList.toggle('active', lang === 'es');
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.documentElement.lang = lang;
+}
+
+function setTab(n) {
+  currentTab = n;
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById('panel' + i).classList.toggle('active', i === n);
+    document.getElementById('tab' + i).classList.toggle('active', i === n);
+  }
+  document.getElementById('notesBox').style.display = (n === 3) ? 'none' : 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+setLang('es');
+setTab(1);
+</script>
+
+</body>
+</html>
